@@ -4,8 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
 marshmallow = "*"
+python-dotenv = "*"
+python-jose = "*"
+flask-cors = "*"
+six = "*"
+flask = "==2.2"
+werkzeug = "==2.2.2"
 
 [dev-packages]
 

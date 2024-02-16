@@ -3,7 +3,9 @@ from flask import Flask, jsonify, request
 from easyexps.model.expense import Expense, ExpenseSchema
 from easyexps.model.income import Income, IncomeSchema
 from easyexps.model.transaction_type import TransactionType
+from easyexps.model.transaction import TransactionSchema
 
+from easyexps.secure.auth import AuthError, requires_auth, requires_scope
 
 app = Flask(__name__)
 
@@ -25,6 +27,7 @@ def get_incomes():
 
 
 @app.route("/api/incomes", methods=['POST'])
+@requires_auth
 def add_incomes():
     income = IncomeSchema().load(request.get_json())
     transactions.append(income)
@@ -41,10 +44,32 @@ def get_expenses():
 
 
 @app.route('/api/expenses', methods=['POST'])
+@requires_auth
 def add_expenses():
     expense = ExpenseSchema().load(request.get_json())
     transactions.append(expense)
     return '', 204
+
+
+@app.route('/api/transactions')
+@requires_auth
+def get_transactions():
+    if requires_scope("read:admin"):
+        schema = TransactionSchema(many=True)
+        all_trans = schema.dump(transactions)
+        return jsonify(all_trans)
+
+    raise AuthError({
+        "code": "Unauthorized",
+        "description": "This resource needs admin scope"
+    }, 403)
+
+
+@app.errorhandler(AuthError)
+def handle_auth_error(ex):
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
 
 
 if __name__ == "__main__":
