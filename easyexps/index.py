@@ -4,8 +4,14 @@ from easyexps.model.expense import Expense, ExpenseSchema
 from easyexps.model.income import Income, IncomeSchema
 from easyexps.model.transaction_type import TransactionType
 from easyexps.model.transaction import TransactionSchema
-
 from easyexps.secure.auth import AuthError, requires_auth, requires_scope
+
+import logging
+
+logging.basicConfig(filename='record.log',
+                    level=logging.INFO,
+                    format='%(asctime)s %(levelname)s %(name)s' +
+                    '%(threadName)s : %(message)s')
 
 app = Flask(__name__)
 
@@ -31,6 +37,7 @@ def get_incomes():
 def add_incomes():
     income = IncomeSchema().load(request.get_json())
     transactions.append(income)
+    app.logger.info("New income added.")
     return '', 204
 
 
@@ -48,6 +55,7 @@ def get_expenses():
 def add_expenses():
     expense = ExpenseSchema().load(request.get_json())
     transactions.append(expense)
+    app.logger.info("New expense added.")
     return '', 204
 
 
