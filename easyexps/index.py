@@ -7,7 +7,9 @@ from easyexps.model.transaction import TransactionSchema
 from easyexps.secure.auth import AuthError, requires_auth, requires_scope
 
 import logging
+import werkzeug.serving
 
+werkzeug.serving._log_add_style = False
 logging.basicConfig(filename='record.log',
                     level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(name)s' +
@@ -77,6 +79,7 @@ def get_transactions():
 def handle_auth_error(ex):
     response = jsonify(ex.error)
     response.status_code = ex.status_code
+    app.logger.warning('Auth exception occurred')
     return response
 
 
